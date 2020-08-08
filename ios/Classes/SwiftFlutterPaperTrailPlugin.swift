@@ -2,19 +2,19 @@ import Flutter
 import UIKit
 import PaperTrailLumberjack
 
-extension DDLogLevel {
-    static func fromString(logLevelString:String) -> DDLogLevel {
+extension DDLogFlag {
+    static func fromString(_ logLevelString: String) -> DDLogFlag {
         switch logLevelString {
         case "error":
-            return DDLogLevel.error
+            return DDLogFlag.error
         case "warning":
-            return DDLogLevel.warning
+            return DDLogFlag.warning
         case "info":
-            return DDLogLevel.info
+            return DDLogFlag.info
         case "debug":
-            return DDLogLevel.debug
+            return DDLogFlag.debug
         default:
-            return DDLogLevel.info
+            return DDLogFlag.info
         }
     }
 }
@@ -74,18 +74,20 @@ public class SwiftFlutterPaperTrailPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "Missing arguments", message: "Missing logLevel", details: nil))
             return
         }
-        let logLevel = DDLogLevel.fromString(logLevelString: logLevelString)
-        switch logLevel {
-        case .debug:
-            DDLogDebug(message)
-        case .info:
-            DDLogInfo(message)
-        case .error:
-            DDLogError(message)
-        default:
-            DDLogError(message)
-        }
-        
+        let flag = DDLogFlag.fromString(logLevelString)
+        let logMessage = DDLogMessage(
+            message: message,
+            level: dynamicLogLevel,
+            flag: flag,
+            context: 0,
+            file: "",
+            function: "",
+            line: 0,
+            tag: nil,
+            options: [],
+            timestamp: nil)
+        DDLog.sharedInstance.log(asynchronous: true, message: logMessage)
+
         result("logged")
     }
     
